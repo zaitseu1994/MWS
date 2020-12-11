@@ -1,0 +1,28 @@
+var searchData=
+[
+  ['enable_5finterrupts',['enable_interrupts',['../acc__hal__integration__single__thread__stm32cube__2x__sparkfun__a111_8c.html#a0940b55f21fc46c48311cb641587060e',1,'enable_interrupts(void):&#160;acc_hal_integration_single_thread_stm32cube_2x_sparkfun_a111.c'],['../acc__hal__integration__single__thread__stm32cube__sparkfun__a111_8c.html#a0940b55f21fc46c48311cb641587060e',1,'enable_interrupts(void):&#160;acc_hal_integration_single_thread_stm32cube_sparkfun_a111.c'],['../acc__hal__integration__single__thread__stm32cube__xc111__r4a_8c.html#a0940b55f21fc46c48311cb641587060e',1,'enable_interrupts(void):&#160;acc_hal_integration_single_thread_stm32cube_xc111_r4a.c'],['../acc__hal__integration__single__thread__stm32cube__xc112_8c.html#a0940b55f21fc46c48311cb641587060e',1,'enable_interrupts(void):&#160;acc_hal_integration_single_thread_stm32cube_xc112.c']]],
+  ['envelope_20service',['Envelope Service',['../group__Envelope.html',1,'']]],
+  ['envelope_20service',['Envelope Service',['../envelope.html',1,'md__home_ai_jenkins_workspace_sw-main_doc_user_guides_rss_user_guide_main']]],
+  ['envelope_2emd',['envelope.md',['../envelope_8md.html',1,'']]],
+  ['example_5fassembly_5ftest_2ec',['example_assembly_test.c',['../example__assembly__test_8c.html',1,'']]],
+  ['example_5fassembly_5ftest_2eh',['example_assembly_test.h',['../example__assembly__test_8h.html',1,'']]],
+  ['example_5fdetector_5fdistance_2ec',['example_detector_distance.c',['../example__detector__distance_8c.html',1,'']]],
+  ['example_5fdetector_5fdistance_2eh',['example_detector_distance.h',['../example__detector__distance_8h.html',1,'']]],
+  ['example_5fdetector_5fdistance_5frecorded_2ec',['example_detector_distance_recorded.c',['../example__detector__distance__recorded_8c.html',1,'']]],
+  ['example_5fdetector_5fdistance_5frecorded_2eh',['example_detector_distance_recorded.h',['../example__detector__distance__recorded_8h.html',1,'']]],
+  ['example_5fdetector_5fpresence_2ec',['example_detector_presence.c',['../example__detector__presence_8c.html',1,'']]],
+  ['example_5fdetector_5fpresence_2eh',['example_detector_presence.h',['../example__detector__presence_8h.html',1,'']]],
+  ['example_5fget_5fnext_5fby_5freference_2ec',['example_get_next_by_reference.c',['../example__get__next__by__reference_8c.html',1,'']]],
+  ['example_5fget_5fnext_5fby_5freference_2eh',['example_get_next_by_reference.h',['../example__get__next__by__reference_8h.html',1,'']]],
+  ['example_5fservice_5fenvelope_2ec',['example_service_envelope.c',['../example__service__envelope_8c.html',1,'']]],
+  ['example_5fservice_5fenvelope_2eh',['example_service_envelope.h',['../example__service__envelope_8h.html',1,'']]],
+  ['example_5fservice_5fiq_2ec',['example_service_iq.c',['../example__service__iq_8c.html',1,'']]],
+  ['example_5fservice_5fiq_2eh',['example_service_iq.h',['../example__service__iq_8h.html',1,'']]],
+  ['example_5fservice_5fpower_5fbins_2ec',['example_service_power_bins.c',['../example__service__power__bins_8c.html',1,'']]],
+  ['example_5fservice_5fpower_5fbins_2eh',['example_service_power_bins.h',['../example__service__power__bins_8h.html',1,'']]],
+  ['example_5fservice_5fsparse_2ec',['example_service_sparse.c',['../example__service__sparse_8c.html',1,'']]],
+  ['example_5fservice_5fsparse_2eh',['example_service_sparse.h',['../example__service__sparse_8h.html',1,'']]],
+  ['execute_5fmovement_5ftracking',['execute_movement_tracking',['../ref__app__smart__presence_8c.html#a09a59a5d0c9a2dcecdbb7e94dacdd7e6',1,'ref_app_smart_presence.c']]],
+  ['execute_5fwakeup',['execute_wakeup',['../ref__app__smart__presence_8c.html#ad38e1cf1ea7fa58f6d2aa01e6d4ed21e',1,'ref_app_smart_presence.c']]],
+  ['experimental',['Experimental',['../group__Experimental.html',1,'']]]
+];
