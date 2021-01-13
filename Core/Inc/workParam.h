@@ -31,6 +31,7 @@ WORKSTATUS CopyReadTable(TableRead Source,TableRead destination);
 WORKSTATUS CopyWriteTable(TableWrite Source,TableWrite destination);
 WORKSTATUS CopyCalibrTable(struct_workTable* Source,struct_workTable* destination,uint16_t size);
 
+uint16_t get_filtred_distanse(uint16_t X);
 float get_volume_interpolation(float X);
 void setup_end_work_table(int end);
 int  get_end_work_table();

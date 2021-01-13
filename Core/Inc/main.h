@@ -30,14 +30,30 @@ extern "C" {
 /* Includes ------------------------------------------------------------------*/
 #include "stm32l4xx_hal.h"
 
-#include <stdbool.h>
-
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+
+#include "stdbool.h"
+
 #define BUTTON_USER_Pin GPIO_PIN_2
 #define BUTTON_USER_GPIO_Port GPIOA
 #define RS485_RTS_Pin GPIO_PIN_8
 #define RS485_RTS_GPIO_Port GPIOA
+
+#define CAN_RES_Pin GPIO_PIN_0
+#define CAN_RES_Port GPIOC
+
+#define CAN_POW_Pin GPIO_PIN_1
+#define CAN_POW_Port GPIOC
+
+#define RS485_RES_Pin GPIO_PIN_14
+#define RS485_RES_Port GPIOB
+
+#define RS485_POW_Pin GPIO_PIN_15
+#define RS485_POW_Port GPIOB
+
+#define RS485_DIR_PORT GPIOA
+#define RS485_DIR_Pin GPIO_PIN_4
 /* USER CODE END Includes */
 
 /* Exported types ------------------------------------------------------------*/

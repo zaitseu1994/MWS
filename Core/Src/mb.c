@@ -63,6 +63,8 @@
 static UCHAR    ucMBAddress;
 static eMBMode  eMBCurrentMode;
 
+volatile static eMBEventType    CurEvent;
+
 static enum
 {
     STATE_ENABLED,
@@ -355,6 +357,7 @@ eMBErrorCode eMBPoll( void )
      * Otherwise we will handle the event. */
     if( xMBPortEventGet( &eEvent ) == TRUE )
     {
+    	CurEvent = eEvent;
         switch ( eEvent )
         {
         case EV_READY:
@@ -413,4 +416,9 @@ eMBErrorCode eMBPoll( void )
         }
     }
     return MB_ENOERR;
+}
+
+eMBEventType eMBStateFunc()
+{
+	return CurEvent;
 }

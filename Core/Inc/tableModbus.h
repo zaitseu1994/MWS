@@ -70,7 +70,7 @@ typedef struct struct_tableRegsWrite
     uint16_t  TypeAverag;       // Тип усреднения                  // 2b
     uint16_t  IntervalAverag;   // Интервал усреднения             // 2b
     uint16_t  Password;         // Пароль                          // 2b <-39
-    uint16_t  res6;                                                // 2b 82b  <- 40 adr
+    uint16_t  Reslift;                                             // 2b 82b  <- 40 adr
 
     uint64_t  timeconnect;      // Дата последней связи            // 8b 90b  <- 41 adr
     uint64_t  timechange;       // Дата изменения настроек         // 8b

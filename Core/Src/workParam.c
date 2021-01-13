@@ -19,6 +19,12 @@
 #define LINEAR_TYPE_APPROXIMATION 0
 #define LAGRANJ_TYPE_APPROXIMATION 1
 
+#define TYPE_AVERAGE_SUM 1
+#define TYPE_AVERAGE_EXP 0
+
+#define FILTER_COEF 0.7
+#define MAX_NUM_SUM 40
+
 //===================================================================================
 /**
   sTable - таблица для расчета crc.
@@ -53,7 +59,10 @@ TableWrite work_config_write = &un_tableWrite;
 struct_workTable TableWorkParam = {{{0}},0};
 
 float (*volume_approximation)(float X) = NULL;
+uint16_t (*filtred_val)(uint16_t X) = NULL;
 
+static uint16_t filtred_distanse = 0;
+volatile float Coef_EXP = 0.9;
 //===================================================================================
 
 uint32_t maPrime2dHash (unsigned char *str, uint32_t len)
@@ -74,13 +83,13 @@ uint32_t maPrime2dHash (unsigned char *str, uint32_t len)
 
 float Lagranj (float X)
 {
-   // int n = current_work_end_table;
     int n  = TableWorkParam.end_of_table;
     float L, l;
     int i, j;
-
     L = 0;
-
+    if( (X < TableWorkParam.table[n-1].pointDistanse)  &&
+ 	    (X > TableWorkParam.table[0].pointDistanse)
+    )
     for (i = 0; i < n; ++i)
     {
         l = 1;
@@ -100,6 +109,9 @@ float Linear (float X)
 {
    float x0 = 0,x1 = 0,y0 = 0,y1 = 0;
    float Fx = 0;
+   if( (X < TableWorkParam.table[TableWorkParam.end_of_table-1].pointDistanse)  &&
+	   (X > TableWorkParam.table[0].pointDistanse)
+   )
    if(TableWorkParam.end_of_table >=2)
    {
       for(int i=TableWorkParam.end_of_table-1;i>=1;i--)
@@ -126,6 +138,45 @@ float Linear (float X)
 
 //===================================================================================
 
+uint16_t runing_averageSUM(uint16_t newVal) {
+  static int t = 0;
+  static int vals[MAX_NUM_SUM];
+  static int average = 0;
+  uint8_t num = (un_tableWrite.Regs.IntervalAverag*2);
+  if(num == 0)
+  num = 1;
+  if (++t >= num) t = 0; // перемотка t
+  average -= vals[t];         // вычитаем старое
+  average += newVal;          // прибавляем новое
+  vals[t] = newVal;           // запоминаем в массив
+  return (uint16_t)((float)average / num);
+}
+
+//===================================================================================
+
+uint16_t runing_averageEXP(uint16_t X)
+{
+  if( ( ((filtred_distanse - X) < 0) && (X/filtred_distanse > 1.5))
+	 ||
+	 ( ((filtred_distanse - X) > 0) && (filtred_distanse/X > 1.5) )
+  ) // значение расстояния стало резко больше или меньше чем в 1,5 раза
+  {
+	 filtred_distanse = X * 0.9 + filtred_distanse * (0.1);
+  }else
+  {
+	filtred_distanse = X * Coef_EXP + filtred_distanse * (1 - Coef_EXP);
+  }
+  return filtred_distanse;
+}
+
+uint16_t get_filtred_distanse(uint16_t X)
+{
+	if( filtred_val )
+	return filtred_val(X);
+	else
+	return 0;
+}
+
 float get_volume_interpolation(float X)
 {
 	if ( volume_approximation )
@@ -143,9 +194,26 @@ void accept_param()
 	 else
      volume_approximation  = Lagranj;
 
+	 if(  un_tableWrite.Regs.TypeAverag == TYPE_AVERAGE_SUM )
+	 {
+		 filtred_val = runing_averageSUM;
+	 }
+	 else
+		 filtred_val = runing_averageEXP;
+	 filtred_distanse = 0;
+
 	 un_tableRead.Regs.timechange = un_tableWrite.Regs.timechange;
 	 un_tableRead.Regs.idchange = un_tableWrite.Regs.idchange;
 	 un_tableRead.Regs.idset = un_tableWrite.Regs.idset;
+
+	 if( un_tableWrite.Regs.IntervalAverag!=0 )
+	 Coef_EXP = ((float)1/un_tableWrite.Regs.IntervalAverag);
+
+	 HAL_GPIO_WritePin(CAN_RES_Port, CAN_RES_Pin, un_tableWrite.Regs.Reslift & 0x0f00 ? GPIO_PIN_SET:GPIO_PIN_RESET);
+	 HAL_GPIO_WritePin(CAN_POW_Port, CAN_POW_Pin, un_tableWrite.Regs.Reslift & 0xf000 ? GPIO_PIN_SET:GPIO_PIN_RESET);
+	 HAL_GPIO_WritePin(RS485_RES_Port, RS485_RES_Pin, un_tableWrite.Regs.Reslift & 0x000f ? GPIO_PIN_SET:GPIO_PIN_RESET);
+	 HAL_GPIO_WritePin(RS485_POW_Port, RS485_POW_Pin, un_tableWrite.Regs.Reslift & 0x00f0 ? GPIO_PIN_SET:GPIO_PIN_RESET);
+
 }
 
 //===================================================================================
@@ -214,7 +282,7 @@ uint8_t Flash_WritePage(uint32_t address, uint8_t* data, int size)
   {
 	if ( HAL_FLASH_Program(FLASH_TYPEPROGRAM_DOUBLEWORD, address, *word ) != HAL_OK )
 	{
-		 uint32_t er = HAL_FLASH_GetError();
+		 HAL_FLASH_GetError();
 		 return 0;
 	}
 	word++;
@@ -301,10 +369,10 @@ WORKSTATUS SetInitialTableRead(TableRead tableRead)
 
 WORKSTATUS SetInitialTableWrite(TableWrite tableWrite)
 {
-	tableWrite->Regs.AsynchMeasure = 1;
+	tableWrite->Regs.AsynchMeasure = 0;
 	tableWrite->Regs.DownSampFactor = 1;
-	tableWrite->Regs.HWAAS = 10;
-	tableWrite->Regs.LenghtOfMeasure = 2.5;
+	tableWrite->Regs.HWAAS = 20;
+	tableWrite->Regs.LenghtOfMeasure = 1.2;
 	tableWrite->Regs.MaximizeSignal = 0;
 	tableWrite->Regs.NoiseLevel = 1;
 	tableWrite->Regs.PowerSaveMode = 3;
@@ -323,6 +391,7 @@ WORKSTATUS SetInitialTableWrite(TableWrite tableWrite)
 	tableWrite->Regs.AdrModbus = 10;
 	tableWrite->Regs.IntervalAverag  = 5;
 	tableWrite->Regs.Password = 0;
+    tableWrite->Regs.Reslift = 0;
 
 	tableWrite->Regs.RegCommand = 0;
 	tableWrite->Regs.RegStatus = 0;

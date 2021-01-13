@@ -17,4 +17,6 @@ bool radar_activate_rss();
 bool radar_start_with_settings(TableWrite TableWrite);
 uint16_t radar_get_measure();
 
+uint16_t radar_get_measure_test(TableWrite TableWrite);
+
 #endif /* INC_A111_MEASURE_H_ */
