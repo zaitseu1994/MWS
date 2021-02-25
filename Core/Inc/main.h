@@ -35,6 +35,9 @@ extern "C" {
 
 #include "stdbool.h"
 
+#define WORK
+//#define RS485_TEST
+
 #define BUTTON_USER_Pin GPIO_PIN_2
 #define BUTTON_USER_GPIO_Port GPIOA
 #define RS485_RTS_Pin GPIO_PIN_8

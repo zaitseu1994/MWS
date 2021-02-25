@@ -41,7 +41,7 @@ typedef union_tableRegsRead* TableRead;
 typedef struct struct_tableRegsWrite
 {
     uint16_t  CurrentDistanse;   // Текущее измеряемое расстояние  // 2b <- 0
-    float     CurrentVolume;     // Текущий измеряемый обьем       // 4b
+    uint32_t  CurrentVolume;     // Текущий измеряемый обьем       // 4b
     int       res3;              //                                // 4b
     uint16_t  RegTransfer1;      // Регистр приема передачи 1      // 2b
     float     RegTransfer2;      // Регистр приема передачи 2      // 4b

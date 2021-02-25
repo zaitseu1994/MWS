@@ -35,6 +35,8 @@
 #include "tableEvents.h"
 #include "workParam.h"
 
+#include "serialProtocols.h"
+
 #include "math.h"
 
 #include "a111_measure.h"
@@ -43,9 +45,6 @@
 
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
-
-#define WORK
-//#define RS485_TEST
 
 /* USER CODE END PTD */
 
@@ -171,8 +170,10 @@ int main(void)
 
   CopyCalibrTable(&TableWorkParam, &TableDuplicate, sizeof(TableDuplicate));
 
-
   HAL_TIM_Base_Start_IT(&htim2);
+
+  serialProtocolsInit(duplicate_config_write,duplicate_config_read ); // установка параметров для протокола LLC
+  serialProtocolsSetAdress(work_config_write->Regs.AdrModbus);// установка адреса для протокола LLC
 
   eMBInit( MB_RTU, duplicate_config_write->Regs.AdrModbus, &huart2, 19200, &htim4 );
   eMBEnable( );
@@ -290,7 +291,7 @@ int main(void)
       duplicate_config_write->Regs.CurrentDistanse = (uint16_t)s;
       float volume = (float) s;
 #endif
-      duplicate_config_write->Regs.CurrentVolume = volume;
+      duplicate_config_write->Regs.CurrentVolume = (uint32_t)(volume*1000);
       tim2_timeout = false;
       NVIC_EnableIRQ(USART2_IRQn);
    }
@@ -497,7 +498,7 @@ static void MX_TIM4_Init(void)
   htim4.Instance = TIM4;
   htim4.Init.Prescaler = 71;
   htim4.Init.CounterMode = TIM_COUNTERMODE_UP;
-  htim4.Init.Period = 49;
+  htim4.Init.Period = 29;
   htim4.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
   htim4.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
   if (HAL_TIM_Base_Init(&htim4) != HAL_OK)

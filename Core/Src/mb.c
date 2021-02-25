@@ -44,6 +44,9 @@
 #include "mbfunc.h"
 
 #include "mbport.h"
+
+#include "serialProtocols.h"
+
 #if MB_SLAVE_RTU_ENABLED == 1
 #include "mbrtu.h"
 #endif
@@ -347,6 +350,8 @@ eMBErrorCode eMBPoll( void )
     eMBErrorCode    eStatus = MB_ENOERR;
     eMBEventType    eEvent;
 
+    static bool llc_received = false;
+
     /* Check if the protocol stack is ready. */
     if( eMBState != STATE_ENABLED )
     {
@@ -373,38 +378,53 @@ eMBErrorCode eMBPoll( void )
                     ( void )xMBPortEventPost( EV_EXECUTE );
                 }
             }
+            else
+            {
+            	llc_received = serialProtocolsReceive( &ucMBFrame, &usLength );
+            	if( llc_received )
+            	{
+                	( void )xMBPortEventPost( EV_EXECUTE );
+            	}
+            }
             break;
-
         case EV_EXECUTE:
-            ucFunctionCode = ucMBFrame[MB_PDU_FUNC_OFF];
-            eException = MB_EX_ILLEGAL_FUNCTION;
-            for( i = 0; i < MB_FUNC_HANDLERS_MAX; i++ )
-            {
-                /* No more function handlers registered. Abort. */
-                if( xFuncHandlers[i].ucFunctionCode == 0 )
+        	if(llc_received)
+        	{
+        		serialProtocolsTransmit(&ucMBFrame, &usLength);
+        		eMBLLCSend(ucMBFrame, usLength );
+        		llc_received = false;
+        	}else
+        	{
+                ucFunctionCode = ucMBFrame[MB_PDU_FUNC_OFF];
+                eException = MB_EX_ILLEGAL_FUNCTION;
+                for( i = 0; i < MB_FUNC_HANDLERS_MAX; i++ )
                 {
-                    break;
+                    /* No more function handlers registered. Abort. */
+                    if( xFuncHandlers[i].ucFunctionCode == 0 )
+                    {
+                        break;
+                    }
+                    else if( xFuncHandlers[i].ucFunctionCode == ucFunctionCode )
+                    {
+                        eException = xFuncHandlers[i].pxHandler( ucMBFrame, &usLength );
+                        break;
+                    }
                 }
-                else if( xFuncHandlers[i].ucFunctionCode == ucFunctionCode )
-                {
-                    eException = xFuncHandlers[i].pxHandler( ucMBFrame, &usLength );
-                    break;
-                }
-            }
 
-            /* If the request was not sent to the broadcast address we
-             * return a reply. */
-            if( ucRcvAddress != MB_ADDRESS_BROADCAST )
-            {
-                if( eException != MB_EX_NONE )
+                /* If the request was not sent to the broadcast address we
+                 * return a reply. */
+                if( ucRcvAddress != MB_ADDRESS_BROADCAST )
                 {
-                    /* An exception occured. Build an error frame. */
-                    usLength = 0;
-                    ucMBFrame[usLength++] = ( UCHAR )( ucFunctionCode | MB_FUNC_ERROR );
-                    ucMBFrame[usLength++] = eException;
+                    if( eException != MB_EX_NONE )
+                    {
+                        /* An exception occured. Build an error frame. */
+                        usLength = 0;
+                        ucMBFrame[usLength++] = ( UCHAR )( ucFunctionCode | MB_FUNC_ERROR );
+                        ucMBFrame[usLength++] = eException;
+                    }
+                    eStatus = peMBFrameSendCur( ucMBAddress, ucMBFrame, usLength );
                 }
-                eStatus = peMBFrameSendCur( ucMBAddress, ucMBFrame, usLength );
-            }
+        	}
             break;
 
         case EV_FRAME_SENT:

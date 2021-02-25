@@ -175,6 +175,8 @@ eMBRTUReceive( UCHAR * pucRcvAddress, UCHAR ** pucFrame, USHORT * pusLength )
     else
     {
         eStatus = MB_EIO;
+        *pusLength = ( USHORT )( usRcvBufferPos );
+        *pucFrame = ( UCHAR * ) & ucRTUBuf[MB_SER_PDU_ADDR_OFF];
     }
 
     EXIT_CRITICAL_SECTION(  );
@@ -219,6 +221,32 @@ eMBRTUSend( UCHAR ucSlaveAddress, const UCHAR * pucFrame, USHORT usLength )
     EXIT_CRITICAL_SECTION(  );
     return eStatus;
 }
+
+eMBErrorCode
+eMBLLCSend(const UCHAR * pucFrame, USHORT usLength )
+{
+    eMBErrorCode    eStatus = MB_ENOERR;
+
+    ENTER_CRITICAL_SECTION(  );
+
+    if( eRcvState == STATE_RX_IDLE )
+    {
+        /* First byte before the Modbus-PDU is the slave address. */
+        pucSndBufferCur = ( UCHAR * ) pucFrame;
+        usSndBufferCount = usLength;
+
+        eSndState = STATE_TX_XMIT;
+        vMBPortSerialEnable( FALSE, TRUE );
+    }
+    else
+    {
+        eStatus = MB_EIO;
+    }
+    EXIT_CRITICAL_SECTION(  );
+    return eStatus;
+}
+
+
 
 BOOL
 xMBRTUReceiveFSM( void )
